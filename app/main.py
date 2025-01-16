@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+
 from fastapi import FastAPI, Response, status, HTTPException
 from fastapi.params import Body
 from pydantic import BaseModel
@@ -6,7 +9,10 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+
 app = FastAPI()
+load_dotenv()
+PASSWORD = os.getenv("PASSWORD")
 
 class Post(BaseModel):
     title: str
@@ -15,7 +21,14 @@ class Post(BaseModel):
     rating : Optional[int]= None
 
 try:
-    conn = psycopg2.connect(host='', database='', user='', password='', cursor_factory='')
+    connection = psycopg2.connect(host='localhost', database='smapi', user='postgres', 
+                                  password=PASSWORD, cursor_factory=RealDictCursor)
+    cursor = connection.cursor()
+    print('Connection to db sucessful!')
+except Exception as error:
+    print('Connection to db failed.')
+    print("Error: ",error)
+
 
 
 my_posts = [{"title": "post1 title", "content": "post1 content", "id": 1}, {"title": "post 2 title", "content": "post 2 content", "id": 2}]
