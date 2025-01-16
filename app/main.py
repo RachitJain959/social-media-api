@@ -3,6 +3,8 @@ from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = FastAPI()
 
@@ -11,6 +13,10 @@ class Post(BaseModel):
     content: str
     published: bool =  True
     rating : Optional[int]= None
+
+try:
+    conn = psycopg2.connect(host='', database='', user='', password='', cursor_factory='')
+
 
 my_posts = [{"title": "post1 title", "content": "post1 content", "id": 1}, {"title": "post 2 title", "content": "post 2 content", "id": 2}]
 
