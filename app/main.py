@@ -2,27 +2,18 @@ from dotenv import load_dotenv
 import os
 
 from fastapi import FastAPI, Response, status, HTTPException, Depends
-from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
-from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
 from . import models
-from .database import engine, SessionLocal
+from .database import engine, get_db
 
 models.Base.metadata.create_all(engine)
 
 app = FastAPI()
 
-# Session to db
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 load_dotenv()
 PASSWORD = os.getenv("PASSWORD")
