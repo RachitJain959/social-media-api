@@ -9,8 +9,21 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+from . import models
+from .database import engine, SessionLocal
+
+models.Base.metadata.create_all(engine)
 
 app = FastAPI()
+
+# Session to db
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 load_dotenv()
 PASSWORD = os.getenv("PASSWORD")
 
