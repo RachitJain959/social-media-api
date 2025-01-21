@@ -1,14 +1,14 @@
 from dotenv import load_dotenv
 import os
 
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing import Optional
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
-
+from sqlalchemy.orm import Session
 from . import models
 from .database import engine, SessionLocal
 
@@ -120,3 +120,7 @@ def update_post(id:int, post:Post):
                             detail= f"post with id:{id} not found.")
     
     return {"data": updated_post}
+
+@app.get("/test")
+def test_post(db: Session = Depends(get_db)):
+    return {"status": "Success"}
