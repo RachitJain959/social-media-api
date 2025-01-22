@@ -175,3 +175,5 @@ cython_debug/
 
 # misc
 readme1.md
+.idea
+.vscode
