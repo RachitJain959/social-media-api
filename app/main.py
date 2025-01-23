@@ -54,10 +54,11 @@ async def root():
 
 # all posts
 @app.get("/posts")
-def get_posts():
-    cursor.execute(""" SELECT * FROM posts """)
-    posts = cursor.fetchall()
-
+def get_posts(db: Session = Depends(get_db)):
+    # cursor.execute(""" SELECT * FROM posts """)
+    # posts = cursor.fetchall()
+    
+    posts = db.query(models.Post).all()
     return {"data": posts}
 
 # single post
@@ -114,4 +115,5 @@ def update_post(id:int, post:Post):
 
 @app.get("/test")
 def test_post(db: Session = Depends(get_db)):
-    return {"status": "Success"}
+    posts = db.query(models.Post).all()
+    return {"data": posts}
