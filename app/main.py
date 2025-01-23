@@ -14,14 +14,13 @@ models.Base.metadata.create_all(engine)
 
 app = FastAPI()
 
-
 load_dotenv()
 PASSWORD = os.getenv("PASSWORD")
 
 class Post(BaseModel):
     title: str
     content: str
-    published: bool =  True
+    published: bool=True
 
 try:
     connection = psycopg2.connect(host='localhost', database='smapi', user='postgres', 
@@ -33,18 +32,17 @@ except Exception as error:
     print("Error: ",error)
 
 
+# my_posts = [{"title": "post1 title", "content": "post1 content", "id": 1}, {"title": "post 2 title", "content": "post 2 content", "id": 2}]
 
-my_posts = [{"title": "post1 title", "content": "post1 content", "id": 1}, {"title": "post 2 title", "content": "post 2 content", "id": 2}]
-
-def find_post(id):
-    for post in my_posts:
-        if post["id"] == id:
-            return post
+# def find_post(id):
+#     for post in my_posts:
+#         if post["id"] == id:
+#             return post
         
-def find_index(id):
-    for i, post in enumerate(my_posts):
-        if post["id"] == id:
-            return i
+# def find_index(id):
+#     for i, post in enumerate(my_posts):
+#         if post["id"] == id:
+#             return i
 
 # home
 @app.get("/")
@@ -112,18 +110,41 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id:int, post:Post):
-    cursor.execute(""" UPDATE posts SET title=%s, content=%s, published=%s WHERE id=%s RETURNING * """, 
-                   (post.title, post.content, post.published, str(id)))
+# def update_post(id:int, post:Post, db: Session = Depends(get_db)):
+#     # cursor.execute(""" UPDATE posts SET title=%s, content=%s, published=%s WHERE id=%s RETURNING * """, 
+#     #                (post.title, post.content, post.published, str(id)))
     
-    updated_post = cursor.fetchone()
-    connection.commit()
+#     # updated_post = cursor.fetchone()
+#     # connection.commit()
 
-    if updated_post == None: 
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail= f"post with id:{id} not found.")
+#     post_query = db.query(models.Post).filter(models.Post.id == id)
+#     post = post_query.first()
+   
+#     # print(type(post)) 
+#     if post == None: 
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+#                             detail= f"post with id:{id} not found.")
     
-    return {"data": updated_post}
+#     post_query.update(**post.__dict__, synchronize_session=False)
+#     db.commit()
+
+#     return {"data": "success"}
+def update_post(id: int, post: Post, db: Session = Depends(get_db)):
+    # Get the existing SQLAlchemy post
+    db_query = db.query(models.Post).filter(models.Post.id == id)
+    db_post = db_query.first()
+
+    if db_post is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                             detail=f"Post with id:{id} not found.")
+    
+    # Update the SQLAlchemy post instance with data from Pydantic model
+    for key, value in post.dict(exclude_unset=True).items():  # Use dict() here
+        setattr(db_post, key, value)  # Set the attribute on the SQLAlchemy instance
+
+    db.commit()
+    return {"data": db_query.first()}
+
 
 @app.get("/test")
 def test_post(db: Session = Depends(get_db)):
