@@ -2,12 +2,10 @@ from dotenv import load_dotenv
 import os
 
 from fastapi import FastAPI, Response, status, HTTPException, Depends
-from pydantic import BaseModel
-from typing import Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
-from . import models
+from . import models, schemas
 from .database import engine, get_db
 
 models.Base.metadata.create_all(engine)
@@ -17,10 +15,6 @@ app = FastAPI()
 load_dotenv()
 PASSWORD = os.getenv("PASSWORD")
 
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool=True
 
 try:
     connection = psycopg2.connect(host='localhost', database='smapi', user='postgres', 
@@ -30,19 +24,6 @@ try:
 except Exception as error:
     print('Connection to db failed.')
     print("Error: ",error)
-
-
-# my_posts = [{"title": "post1 title", "content": "post1 content", "id": 1}, {"title": "post 2 title", "content": "post 2 content", "id": 2}]
-
-# def find_post(id):
-#     for post in my_posts:
-#         if post["id"] == id:
-#             return post
-        
-# def find_index(id):
-#     for i, post in enumerate(my_posts):
-#         if post["id"] == id:
-#             return i
 
 # home
 @app.get("/")
@@ -76,7 +57,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 # create post
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)):
+def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
     #                 (post.title, post.content, post.published))
 
@@ -110,7 +91,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @app.put("/posts/{id}")
-def update_post(id:int, updated_post:Post, db: Session = Depends(get_db)):
+def update_post(id:int, updated_post:schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(""" UPDATE posts SET title=%s, content=%s, published=%s WHERE id=%s RETURNING * """, 
     #                (post.title, post.content, post.published, str(id)))
     
@@ -145,8 +126,3 @@ def update_post(id:int, updated_post:Post, db: Session = Depends(get_db)):
     db.commit()
     return {"data": db_query.first()}
 
-
-@app.get("/test")
-def test_post(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
-    return {"data": posts}
