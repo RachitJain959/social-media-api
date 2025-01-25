@@ -56,7 +56,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return {"post detail": post}
 
 # create post
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(""" INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
     #                 (post.title, post.content, post.published))
@@ -70,7 +70,7 @@ def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_post)
 
-    return {"data": new_post}
+    return new_post
 
 # delete post
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
