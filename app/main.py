@@ -40,7 +40,7 @@ def get_posts(db: Session = Depends(get_db)):
     return {"data": posts}
 
 # single post
-@app.get("/posts/{id}")
+@app.get("/posts/{id}", response_model=schemas.Post)
 def get_post(id: int, db: Session = Depends(get_db)):
     # cursor.execute(""" SELECT * FROM posts WHERE id=%s """, (str(id)))
     # post = cursor.fetchone()
@@ -53,7 +53,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {"error": f"post with id:{id} not found."}
-    return {"post detail": post}
+    return post
 
 # create post
 @app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
@@ -90,7 +90,7 @@ def delete_post(id: int, db: Session = Depends(get_db)):
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-@app.put("/posts/{id}")
+@app.put("/posts/{id}", response_model=schemas.Post)
 def update_post(id:int, updated_post:schemas.PostCreate, db: Session = Depends(get_db)):
     # cursor.execute(""" UPDATE posts SET title=%s, content=%s, published=%s WHERE id=%s RETURNING * """, 
     #                (post.title, post.content, post.published, str(id)))
@@ -109,7 +109,7 @@ def update_post(id:int, updated_post:schemas.PostCreate, db: Session = Depends(g
     post_query.update(updated_post.model_dump(), synchronize_session=False)
     db.commit()
 
-    return {"data": post_query.first()}
+    return post_query.first()
 # def update_post(id: int, post: Post, db: Session = Depends(get_db)):
     # Get the existing SQLAlchemy post
     db_query = db.query(models.Post).filter(models.Post.id == id)
