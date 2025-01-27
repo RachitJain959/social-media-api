@@ -128,7 +128,7 @@ def update_post(id:int, updated_post:schemas.PostCreate, db: Session = Depends(g
     return {"data": db_query.first()}
 
 @app.post("/users", status_code=status.HTTP_201_CREATED)
-def create_user(db: Session = Depends(get_db)):
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     new_user = models.User(**user.model_dump())
     db.add(new_user)
     db.commit()
