@@ -1,3 +1,4 @@
+from typing import List
 from dotenv import load_dotenv
 import os
 
@@ -31,13 +32,13 @@ async def root():
     return {"message": "Hello world"}
 
 # all posts
-@app.get("/posts")
+@app.get("/posts", response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(get_db)):
     # cursor.execute(""" SELECT * FROM posts """)
     # posts = cursor.fetchall()
     
     posts = db.query(models.Post).all()
-    return {"data": posts}
+    return posts
 
 # single post
 @app.get("/posts/{id}", response_model=schemas.Post)
