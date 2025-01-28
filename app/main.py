@@ -1,12 +1,11 @@
 from dotenv import load_dotenv
 import os
 
-from fastapi import FastAPI, Response, status, HTTPException, Depends
+from fastapi import FastAPI
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from sqlalchemy.orm import Session
-from . import models, schemas, utils
-from .database import engine, get_db
+from . import models
+from .database import engine
 from .routers import post, user
 
 models.Base.metadata.create_all(engine)
