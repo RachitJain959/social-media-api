@@ -1,8 +1,13 @@
-from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
-
+from datetime import datetime, timedelta
 from . import schemas
+
+from fastapi import HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
+
 load_dotenv()
 
 from jose import JWTError, jwt
@@ -36,3 +41,10 @@ def verify_access_token(token:str, credentials_exception):
         raise credentials_exception
     
     return token_data
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                          detail=f"could not verify the credentials",
+                                          headers={"WWW-Authenticate": "bearer"})
+    
+    return verify_access_token(token, credentials_exception)
