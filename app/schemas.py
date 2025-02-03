@@ -42,4 +42,4 @@ class Token(BaseModel):
 
 # data to be embedded inside token
 class TokenData(BaseModel):
-    id: int
+    id: Optional[int]
