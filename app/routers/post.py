@@ -37,8 +37,7 @@ def get_post(id: int, db: Session = Depends(get_db),
 def create_post(post: schemas.PostCreate, db: Session = Depends(get_db),
                 current_user: int = Depends(oauth2.get_current_user)):
     
-    print(current_user.email)
-    new_post = models.Post(**post.model_dump())
+    new_post = models.Post(owner_id= current_user.id, **post.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
