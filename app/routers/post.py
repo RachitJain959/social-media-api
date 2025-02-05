@@ -54,9 +54,15 @@ def delete_post(id: int, db: Session = Depends(get_db),
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
 
-    if post_query.first() == None: 
+    post = post_query.first()
+
+    if post == None: 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail= f"post with id:{id} not found.")
+    
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Not authorized to perform requested action.")
     
     post_query.delete(synchronize_session=False)
     db.commit()
