@@ -9,9 +9,10 @@ router = APIRouter(prefix="/posts", tags=['Posts'])
 # all posts
 @router.get("/", response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(get_db),
-                current_user: int = Depends(oauth2.get_current_user), limit: int = 10):
+                current_user: int = Depends(oauth2.get_current_user),
+                limit: int = 10, skip: int = 0):
     
-    posts = db.query(models.Post).limit(limit)
+    posts = db.query(models.Post).limit(limit).offset(skip)
 
     # display posts owned by current user
     # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id)
