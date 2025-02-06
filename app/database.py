@@ -5,6 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
 load_dotenv()
 USERNAME = os.getenv("MYUSERNAME")
 PASSWORD = os.getenv("PASSWORD")
@@ -26,3 +29,13 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# connect to raw postgres
+# try:
+#     connection = psycopg2.connect(host='localhost', database='smapi', user='postgres', 
+#                                   password=PASSWORD, cursor_factory=RealDictCursor)
+#     cursor = connection.cursor()
+#     print('Connection to db sucessful!')
+# except Exception as error:
+#     print('Connection to db failed.')
+#     print("Error: ",error)
