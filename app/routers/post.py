@@ -12,6 +12,7 @@ def get_posts(db: Session = Depends(get_db),
                 current_user: int = Depends(oauth2.get_current_user)):
     
     posts = db.query(models.Post).all()
+    
     # display posts owned by current user
     # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id)
 
