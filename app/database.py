@@ -4,17 +4,19 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from .config import settings
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 load_dotenv()
-USERNAME = os.getenv("MYUSERNAME")
-PASSWORD = os.getenv("PASSWORD")
-IP_ADDRESS = os.getenv("IP_ADDRESS")
-DATABASE_NAME = os.getenv("DATABASE_NAME")
+USERNAME = settings.database_username
+PASSWORD = settings.database_password
+HOSTNAME = settings.database_hostname
+PORTNAME = settings.database_port
+DATABASE_NAME = settings.database_name
 
-SQLALCHEMY_DATABASE_URL = f'postgresql://{USERNAME}:{PASSWORD}@{IP_ADDRESS}/{DATABASE_NAME}'
+SQLALCHEMY_DATABASE_URL = f'postgresql://{USERNAME}:{PASSWORD}@{HOSTNAME}:{PORTNAME}/{DATABASE_NAME}'
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 

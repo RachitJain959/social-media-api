@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime, timedelta
 from . import schemas, database, models
+from .config import settings
 
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
@@ -13,13 +14,9 @@ load_dotenv()
 
 from jose import JWTError, jwt
 
-# Secret key
-# Algo
-# Expiration time
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 def create_access_token(data: dict):
     to_encode = data.copy() # copying the data to not alter the original data
