@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr
+from pydantic.types import conint
 
 class UserOut(BaseModel):
     id: int
@@ -42,3 +43,7 @@ class Token(BaseModel):
 # data to be embedded inside token
 class TokenData(BaseModel):
     id: Optional[int]
+
+class Vote(BaseModel):
+    post_id: int
+    dir: int                # direction of vote: 0 or 1 for liked or not liked
