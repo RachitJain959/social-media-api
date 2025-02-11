@@ -13,15 +13,16 @@ def get_posts(db: Session = Depends(get_db),
                 current_user: int = Depends(oauth2.get_current_user),
                 limit: int = 10, skip: int = 0, search: Optional[str] = ""):
     
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip)
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip)
 
-    results = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
-        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id)
+    posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(
+        models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip)
 
     # display posts owned by current user
     # posts = db.query(models.Post).filter(models.Post.owner_id == current_user.id)
 
-    return results
+    return posts
 
 # single post
 @router.get("/{id}", response_model=schemas.Post)
